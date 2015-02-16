@@ -1,0 +1,49 @@
+/**
+ * CS490-Chat system
+ * Author: Zhiyuan Zheng 
+ * @ Purdue 2015
+ */
+package chat.user.group;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+/** 
+ * An implementation of UserGroup
+ * using ConcurrentHashMap as its underlying data structure,
+ * which is thread-safe and guarantees performance
+ * under intensive read/write operations.
+ * 
+ * This implementation is ideal for chat server.
+ */
+public class UGConcurrentHashMapImpl implements UserGroup {
+
+	/**
+	 * The user group is a map as <userName, User object>. 
+	 */
+	private Map<String, User> userGroup;
+	
+	public UGConcurrentHashMapImpl(){
+		userGroup = new ConcurrentHashMap<String, User>();
+	}
+	
+	public boolean add(final User user) {
+		
+		if(userGroup.containsKey(user.getName())){
+			return false;
+		}
+		
+		userGroup.put(user.getName(), user);
+		
+		return true;
+	}
+
+	public User remove(final String name) {
+		
+		return userGroup.remove(name);
+	}
+
+	public boolean contains(final String name) {
+		return userGroup.containsKey(name);
+	}
+}

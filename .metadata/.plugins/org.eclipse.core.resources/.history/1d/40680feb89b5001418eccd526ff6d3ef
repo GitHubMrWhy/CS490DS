@@ -1,0 +1,28 @@
+package chat.user.group;
+
+import java.util.Date;
+
+/*
+ * User in chat system.
+ */
+public class User {
+	
+	private final String name;
+	
+	private final String ipAddress;
+	
+	private final int port;
+	
+	private long lastHeartBeat;
+	
+	public User(String name, String ip_addr, int port){
+		this.name = name;
+		this.ipAddress = ip_addr;
+		this.port = port;
+		
+		/* Set the last heart beat of the user to current time */ 
+		lastHeartBeat = System.currentTimeMillis();
+	}
+	
+
+}

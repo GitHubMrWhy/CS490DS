@@ -1,0 +1,8 @@
+package chat.usergroup;
+
+public class UGHashMapImpl implements UserGroup {
+
+	public UGHashMapImpl(){
+
+	}
+}

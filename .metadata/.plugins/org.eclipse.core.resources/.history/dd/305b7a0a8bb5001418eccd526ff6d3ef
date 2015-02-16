@@ -1,0 +1,21 @@
+/*
+ * CS490-Chat system
+ * Author: Zhiyuan Zheng 
+ * @ Purdue 2015
+ */
+package chat.user.group;
+
+import java.lang.String;
+
+/*
+ * This interface is used to edit/retrieve the information of
+ * user group a chat system maintains.
+ * It stores user information <name, ipaddress, port>
+ * 
+ */
+public interface UserGroup {
+	
+	public boolean add(String name, String ip_port);
+	public String toString();
+	
+}

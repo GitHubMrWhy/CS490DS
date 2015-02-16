@@ -1,0 +1,19 @@
+package chat.usergroup;
+
+import java.util.Map;
+
+/* An implementation of UserGroup
+ * using ConcurrentHashMap as its underlying data structure,
+ * which is thread-safe and guarantees performance
+ * under intensive read/write operations.
+ */
+public class UGConcurrentHashMapImpl implements UserGroup {
+
+	private Map<String, String> _userGroup;
+	
+	public UGConcurrentHashMapImpl(){
+		_userGroup = new ConcurrentHashMap<K,V>;
+	}
+	
+	
+}

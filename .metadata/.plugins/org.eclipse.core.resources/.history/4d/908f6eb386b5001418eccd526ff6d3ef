@@ -1,0 +1,10 @@
+package chat.usergroup;
+
+import java.lang.String;
+
+public interface UserGroup {
+	
+	
+	public String toString();
+	
+}

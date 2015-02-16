@@ -1,0 +1,11 @@
+package chat.usergroup;
+
+public class UGConcurrentHashMapImpl implements UserGroup {
+
+	public 
+	public UGConcurrentHashMapImpl(){
+
+	}
+	
+	
+}
