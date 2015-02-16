@@ -32,6 +32,14 @@ public interface UserGroup {
 	public User remove(final String name);
 	
 	/**
+	 * Get user from the group.
+	 * @param name
+	 * @return
+	 * 		 The retrieved User object.
+	 */
+	public User get(final String name);
+	
+	/**
 	 * Check if user exists in the group. 
 	 * @param name
 	 * 		The user name.

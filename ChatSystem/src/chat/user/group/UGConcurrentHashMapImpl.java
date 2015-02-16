@@ -46,4 +46,18 @@ public class UGConcurrentHashMapImpl implements UserGroup {
 	public boolean contains(final String name) {
 		return userGroup.containsKey(name);
 	}
+	
+	public String toString(){
+		final StringBuilder sb = new StringBuilder();
+		for(User usr : userGroup.values()){
+			sb.append(usr);
+			sb.append('\n');
+		}
+		
+		return sb.toString();
+	}
+
+	public User get(final String name) {
+		return userGroup.get(name);
+	}
 }
