@@ -40,11 +40,14 @@ public class MessageHandler {
 		String msg;
 		
 		while(null != (msg = in.readLine())) {
+			
 			if(msg.startsWith(ChatSystemConstants.MSG_REG)){
 				
 				log("Received registration request.");
 				
-				final String name = msg.substring(ChatSystemConstants.MSG_REG.length());
+				final int port_sindex = msg.indexOf(':');
+				final String name = msg.substring(ChatSystemConstants.MSG_REG.length(), port_sindex);
+				final int client_port = Integer.parseInt(msg.substring(port_sindex+1));
 				
 				// Check if the user already exists
 				if(userGroup.contains(name)){
@@ -54,7 +57,7 @@ public class MessageHandler {
 					final User new_user = 
 							new User(name, 
 									client.getInetAddress().getHostAddress(),
-									client.getPort());
+									client_port);
 					userGroup.add(new_user);
 					
 					out.println(ChatSystemConstants.MSG_ACK);
@@ -75,9 +78,17 @@ public class MessageHandler {
 			}
 			else if(msg.startsWith(ChatSystemConstants.MSG_GET)){
 				
-				log("Received GET from client");
+				log("Received GET request from client");
+				
+				final StringBuilder sb = new StringBuilder();
+				for(User usr : userGroup.getActiveUsers()){
+					sb.append(usr);
+					sb.append('\n');
+				}
+				
 				out.print(ChatSystemConstants.MSG_USG);
-				out.print(userGroup);
+				out.print(sb);
+			
 				
 			}
 			

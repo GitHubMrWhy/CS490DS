@@ -6,7 +6,7 @@
 package chat.user.group;
 
 import java.lang.String;
-import java.util.Set;
+import java.util.Collection;
 
 /**
  * This interface is used to edit/retrieve the information of
@@ -52,6 +52,6 @@ public interface UserGroup {
 	 * Get a set of active users.
 	 * @return String
 	 */
-	public Set<User> getActiveUsers();
+	public Collection<User> getActiveUsers();
 	
 }

@@ -5,28 +5,29 @@
  */
 package chat.user.group;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import chat.constant.*;
+import chat.constant.ChatSystemConstants;
 
-/** 
- * An implementation of UserGroup
- * using ConcurrentHashMap as its underlying data structure,
- * which is thread-safe and guarantees performance
- * under intensive read/write operations.
+/**
+ * This is a naive implementation of UserGroup.
+ * It is ideal for single-thread chat server. It is not thread-safe!!
  * 
- * This implementation is ideal for multi-threaded chat server.
  */
-public class UGConcurrentHashMapImpl implements UserGroup {
+public class UGSimpleImpl implements UserGroup {
 
 	/**
 	 * The valid time period of active_users.
 	 */
 	private final static int FRESH_PERIOD = ChatSystemConstants.HEARTBEAT_RATE;
+	
+	/**
+	 * The cached set of active users.
+	 */
+	private Set<User> activeUsers;
 	
 	/**
 	 * The time stamp of the cached set.
@@ -40,15 +41,17 @@ public class UGConcurrentHashMapImpl implements UserGroup {
 	
 	
 	
-	public UGConcurrentHashMapImpl(){
+	public UGSimpleImpl(){
 		userGroup = new ConcurrentHashMap<String, User>();
+		activeUsers = new HashSet<User>(ChatSystemConstants.INIT_CAP);
 	}
 	
-	public UGConcurrentHashMapImpl(int concurrencyLevel){
+	public UGSimpleImpl(int concurrencyLevel){
 		userGroup =
 			new ConcurrentHashMap<String, User>(ChatSystemConstants.INIT_CAP, 
 					ChatSystemConstants.LOAD_FACTOR,
 					concurrencyLevel);
+		activeUsers = new HashSet<User>(ChatSystemConstants.INIT_CAP);
 	}
 	
 	public boolean add(final User user) {
@@ -63,8 +66,7 @@ public class UGConcurrentHashMapImpl implements UserGroup {
 			}
 			userGroup.put(user.getName(), user);
 			
-			// TODO: Iterator of activeUser will throw ConcurrentModificationException;
-			return true;	
+			return true;
 		}		
 	}
 
@@ -91,16 +93,18 @@ public class UGConcurrentHashMapImpl implements UserGroup {
 		return userGroup.get(name);
 	}
 
-	public Collection<User> getActiveUsers() {
+	public Set<User> getActiveUsers() {
 
 		synchronized(this){
 			long current_time = System.currentTimeMillis();
 
 			// Check if the cached set of active users is valid.
 			if((activeTimestamp + FRESH_PERIOD) > current_time ){
-				return userGroup.values();
+				return activeUsers;
 			}
 
+			// Else refresh the cached set of active users.
+			Set<User> new_active_users = new HashSet<User>(userGroup.size());
 			Set<String> inactive_names = new HashSet<String>();
 			
 			// Check if user is alive.
@@ -110,17 +114,22 @@ public class UGConcurrentHashMapImpl implements UserGroup {
 					// User becomes inactive
 					inactive_names.add(usr.getName());
 				}
+				else{
+					new_active_users.add(usr);
+				}
 			}
 
 			// Remove inactive users from user group.
 			for(String inactive_name: inactive_names){
-				this.remove(inactive_name);
+				remove(inactive_name);
 			}
 
 			// Update time stamp
 			activeTimestamp = System.currentTimeMillis();
-
-			return userGroup.values();
+			activeUsers = new_active_users;
+			
+			return activeUsers;
 		}
 	}
+
 }
