@@ -18,83 +18,100 @@ import chat.user.group.UserGroup;
 /**
  * Handler for the in-coming messages from client.
  */
-public class MessageHandler {
-	
+public class MessageHandler implements Runnable{
+
+	private UserGroup userGroup;
+
+	private Socket client;
+
 	private boolean isDebug;
-	
+
 	private void log(String message){
 		if(isDebug){
 			System.out.println(message);
 		}
 	}
-	
-	public void handle(Socket client, UserGroup userGroup, boolean isDebug) throws IOException{
-		
+
+	public MessageHandler(final Socket client, final UserGroup userGroup, final boolean isDebug){
+		this.client = client;
+		this.userGroup = userGroup;
 		this.isDebug = isDebug;
-		
-		final BufferedReader in = new BufferedReader(
-				new InputStreamReader(client.getInputStream()));
-		
-		final PrintWriter out = new PrintWriter(client.getOutputStream());
-		
-		String msg;
-		
-		while(null != (msg = in.readLine())) {
-			
-			if(msg.startsWith(ChatSystemConstants.MSG_REG)){
-				
-				log("Received registration request.");
-				
-				final int port_sindex = msg.indexOf(':');
-				final String name = msg.substring(ChatSystemConstants.MSG_REG.length(), port_sindex);
-				final int client_port = Integer.parseInt(msg.substring(port_sindex+1));
-				
-				// Check if the user already exists
-				if(userGroup.contains(name)){
-					out.println(ChatSystemConstants.MSG_REJ);
+	}
+
+	public void run() {
+
+		try{
+			final BufferedReader in = new BufferedReader(
+					new InputStreamReader(client.getInputStream()));
+
+			final PrintWriter out = new PrintWriter(client.getOutputStream());
+
+			String msg;
+
+			while(null != (msg = in.readLine())) {
+
+				if(msg.startsWith(ChatSystemConstants.MSG_REG)){
+
+					log("Received registration request from " + client);
+
+					final int port_sindex = msg.indexOf(':');
+					final String name = msg.substring(ChatSystemConstants.MSG_REG.length(), port_sindex);
+					final int client_port = Integer.parseInt(msg.substring(port_sindex+1));
+
+					// Check if the user already exists
+					if(userGroup.contains(name)){
+						out.println(ChatSystemConstants.MSG_REJ);
+					}
+					else{
+						final User new_user = 
+								new User(name, 
+										client.getInetAddress().getHostAddress(),
+										client_port);
+						userGroup.add(new_user);
+
+						out.println(ChatSystemConstants.MSG_ACK);
+						log("Added new user:" + new_user.toString());
+					}
+				}
+				else if(msg.startsWith(ChatSystemConstants.MSG_HBT)){
+					final String name = msg.substring(ChatSystemConstants.MSG_HBT.length());
+
+					log("Received heart beat from "+name);
+
+					final User alive_user = userGroup.get(name);
+
+					if( null != alive_user){
+						alive_user.setLastHeartBeat(System.currentTimeMillis());
+					}
+
+				}
+				else if(msg.startsWith(ChatSystemConstants.MSG_GET)){
+
+					log("Received GET request from " + client);
+
+					final StringBuilder sb = new StringBuilder();
+					for(User usr : userGroup.getActiveUsers()){
+						sb.append(usr);
+						sb.append('\n');
+					}
+
+					out.print(ChatSystemConstants.MSG_USG);
+					out.print(sb);	
 				}
 				else{
-					final User new_user = 
-							new User(name, 
-									client.getInetAddress().getHostAddress(),
-									client_port);
-					userGroup.add(new_user);
-					
-					out.println(ChatSystemConstants.MSG_ACK);
-					log("Added new user:" + new_user.toString());
+					log("Received invalid message ("+ msg + ") from " + client);
+					break;
 				}
-			}
-			else if(msg.startsWith(ChatSystemConstants.MSG_HBT)){
-				final String name = msg.substring(ChatSystemConstants.MSG_HBT.length());
-				
-				log("Received heart beat from "+name);
-				
-				final User alive_user = userGroup.get(name);
-				
-				if( null != alive_user){
-					alive_user.setLastHeartBeat(System.currentTimeMillis());
-				}
-				
-			}
-			else if(msg.startsWith(ChatSystemConstants.MSG_GET)){
-				
-				log("Received GET request from client");
-				
-				final StringBuilder sb = new StringBuilder();
-				for(User usr : userGroup.getActiveUsers()){
-					sb.append(usr);
-					sb.append('\n');
-				}
-				
-				out.print(ChatSystemConstants.MSG_USG);
-				out.print(sb);
+
+			}// End while
 			
-				
-			}
+			// Close the connection with client
+			log("Close connection with " + client);
+			client.close();
 			
+		}catch (IOException e){
+			log(e.getMessage());
 		}
-	
-		
 		
 	}
 }

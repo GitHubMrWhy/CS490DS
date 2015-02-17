@@ -44,6 +44,11 @@ public class UGConcurrentHashMapImpl implements UserGroup {
 		userGroup = new ConcurrentHashMap<String, User>();
 	}
 	
+	/**
+	 * Constructor.
+	 * @param concurrencyLevel
+	 * 		the estimated number of concurrently updating threads.
+	 */
 	public UGConcurrentHashMapImpl(int concurrencyLevel){
 		userGroup =
 			new ConcurrentHashMap<String, User>(ChatSystemConstants.INIT_CAP, 
