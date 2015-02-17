@@ -5,7 +5,7 @@
  */
 package chat.server;
 
-import chat.user.group.UGConcurrentHashMapImpl;
+import chat.user.group.UGSimpleImpl;
 import chat.user.group.UserGroup;
 import chat.constant.*;
 
@@ -50,7 +50,7 @@ public class SingleThreadedChatServer {
 	 * @throws IOException
 	 */
 	public void init() throws IOException {
-		userGroup = new UGConcurrentHashMapImpl();
+		userGroup = new UGSimpleImpl();
 		msgHandler = new MessageHandler();
 		listener = new ServerSocket(port);
 		log("Socket created " + listener.toString());
