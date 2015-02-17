@@ -5,11 +5,31 @@ package chat.constant;
  */
 public class ChatSystemConstants {
 	
-	// Default port for server 
-	public static int DEFAULT_PORT = 8888;
 	
-	// Heart beat rate in second used to maintain user group.
-	public static int HEARTBEAT_RATE = 600;
+	/**
+	 * Default port for server 
+	 */
+	public final static int DEFAULT_PORT = 8888;
+	
+	/**
+	 * Heart beat rate in millisecond used to maintain user group.
+	 */
+	public final static int HEARTBEAT_RATE = 60*1000;
+	
+	/**
+	 * Default size of thread pool.
+	 */
+	public final static int NUM_THREAD = 16;
+	
+	/**
+	 * Default initial capacity of user group.
+	 */
+	public final static int INIT_CAP = 128;
+	
+	/**
+	 * Default load factor.
+	 */
+	public final static float LOAD_FACTOR = 0.75f;
 	
 	/**
 	 * Each message communicated between server and client
@@ -21,27 +41,27 @@ public class ChatSystemConstants {
 	/**
 	 * Prefix of acknowledgment sent by server to confirm user registration.
 	 */
-	public static String MSG_ACK = "ACK";
+	public final static String MSG_ACK = "ACK";
 	
 	/**
 	 * Prefix of heart beat sent by client to confirm liveness.
 	 */
-	public static String MSG_HBT = "HBT";
+	public final static String MSG_HBT = "HBT";
 
 	/**
 	 * Prefix of Registration request sent by client.
 	 */
-	public static String MSG_REG = "REG";
+	public final static String MSG_REG = "REG";
 	
 	/**
 	 * Prefix of Get command sent by client to retrieve user group information.
 	 */
-	public static String MSG_GET = "GET";
+	public final static String MSG_GET = "GET";
 	
 	/**
 	 * Prefix of Rejecting client request sent by server
 	 */
-	public static String MSG_REJ = "REJ";
+	public final static String MSG_REJ = "REJ";
 	
 	/**
 	 * Prefix of user group information sent by server. 
@@ -49,10 +69,7 @@ public class ChatSystemConstants {
 	 * Here we assume the server won't send other message after
 	 * sending group information.
 	 */
-	public static String MSG_USG = "USG";
-	
-	
-	
+	public final static String MSG_USG = "USG";
 	
 	
 }
