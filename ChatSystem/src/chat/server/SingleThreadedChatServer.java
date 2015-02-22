@@ -10,6 +10,7 @@ import chat.user.group.UserGroup;
 import chat.constant.*;
 
 import java.io.IOException;
+import java.net.DatagramSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashSet;
@@ -46,7 +47,12 @@ public class SingleThreadedChatServer {
 		this.isDebug = isDebug;
 		userGroup = new UGSimpleImpl();
 		listener = new ServerSocket(port);
-		log("Socket created " + listener.toString());
+		
+		final DatagramSocket udpSocket = new DatagramSocket(port);
+		new Thread(new HeartbeatReceiver(userGroup, udpSocket, isDebug)).start();
+		
+		
+		log("Created " + listener.toString());
 	}
 	
 	private void log(String message){
@@ -60,9 +66,10 @@ public class SingleThreadedChatServer {
 			while(true){
 				Socket client = listener.accept();
 				log("New connection # " + clientNumber +" at " + client);
+				
 				clientNumber++;
 				
-				// Handle messages from client.
+				// Handle message from client.
 				new MessageHandler(client, userGroup, isDebug).run();
 				
 				log("Close the # " + clientNumber + " connection.");

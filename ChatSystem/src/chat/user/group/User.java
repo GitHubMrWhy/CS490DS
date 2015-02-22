@@ -5,6 +5,8 @@
  */
 package chat.user.group;
 
+import chat.constant.ChatSystemConstants;
+
 /**
  * Represents an user in chat system.
  */
@@ -61,7 +63,10 @@ public class User {
 		return port;
 	}
 	
-	
+	public boolean isActive(long currentTime) {
+		return ((getLastHeartBeat() + ChatSystemConstants.HEARTBEAT_RATE)
+				> currentTime);
+	}
 	
 
 }

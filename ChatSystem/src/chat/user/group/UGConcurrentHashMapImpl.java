@@ -25,8 +25,10 @@ public class UGConcurrentHashMapImpl implements UserGroup {
 
 	/**
 	 * The valid time period of active_users.
+	 * The factor is for making the period longer than heartbeat_rate
+	 * in case that service executor is busy.
 	 */
-	private final static int FRESH_PERIOD = ChatSystemConstants.HEARTBEAT_RATE;
+	private final static int VALID_PERIOD = (int) (ChatSystemConstants.HEARTBEAT_RATE * 1.2);
 	
 	/**
 	 * The time stamp of the cached set.
@@ -63,7 +65,7 @@ public class UGConcurrentHashMapImpl implements UserGroup {
 		 * two users with the same name.
 		 */
 		synchronized(userGroup){
-			if(userGroup.containsKey(user.getName())){
+			if(contains(user.getName())){
 				return false;
 			}
 			userGroup.put(user.getName(), user);
@@ -79,7 +81,20 @@ public class UGConcurrentHashMapImpl implements UserGroup {
 	}
 
 	public boolean contains(final String name) {
-		return userGroup.containsKey(name);
+		final User user = userGroup.get(name);
+		
+		if (user == null){
+			return false;
+		}
+		else {
+			if(user.isActive(System.currentTimeMillis())) {
+				return true;
+			}
+			else{
+				userGroup.remove(name);
+				return false;
+			}
+		}
 	}
 	
 	public String toString(){
@@ -102,7 +117,7 @@ public class UGConcurrentHashMapImpl implements UserGroup {
 			long current_time = System.currentTimeMillis();
 
 			// Check if the cached set of active users is valid.
-			if((activeTimestamp + FRESH_PERIOD) > current_time ){
+			if((activeTimestamp + VALID_PERIOD) > current_time ){
 				return userGroup.values();
 			}
 
@@ -110,8 +125,8 @@ public class UGConcurrentHashMapImpl implements UserGroup {
 			
 			// Check if user is alive.
 			for(User usr : userGroup.values()){
-				if((usr.getLastHeartBeat() + ChatSystemConstants.HEARTBEAT_RATE) 
-						< current_time){
+				
+				if(!usr.isActive(current_time)){
 					// User becomes inactive
 					inactive_names.add(usr.getName());
 				}

@@ -44,7 +44,8 @@ public class MessageHandler implements Runnable{
 			final BufferedReader in = new BufferedReader(
 					new InputStreamReader(client.getInputStream()));
 
-			final PrintWriter out = new PrintWriter(client.getOutputStream());
+			// Set writer to be auto-flushed!
+			final PrintWriter out = new PrintWriter(client.getOutputStream(), true);
 
 			String msg;
 
@@ -58,7 +59,6 @@ public class MessageHandler implements Runnable{
 					final String name = msg.substring(ChatSystemConstants.MSG_REG.length(), port_sindex);
 					final int client_port = Integer.parseInt(msg.substring(port_sindex+1));
 
-					// Check if the user already exists
 					if(userGroup.contains(name)){
 						out.println(ChatSystemConstants.MSG_REJ);
 					}
@@ -67,23 +67,16 @@ public class MessageHandler implements Runnable{
 								new User(name, 
 										client.getInetAddress().getHostAddress(),
 										client_port);
-						userGroup.add(new_user);
 
-						out.println(ChatSystemConstants.MSG_ACK);
-						log("Added new user:" + new_user.toString());
+						if(userGroup.add(new_user)){
+							out.println(ChatSystemConstants.MSG_ACK);
+							log("Added new user:" + new_user.toString());
+						}
+						else {
+							out.println(ChatSystemConstants.MSG_REJ);
+							log("Failed to add user " + new_user);
+						}
 					}
-				}
-				else if(msg.startsWith(ChatSystemConstants.MSG_HBT)){
-					final String name = msg.substring(ChatSystemConstants.MSG_HBT.length());
-
-					log("Received heart beat from "+name);
-
-					final User alive_user = userGroup.get(name);
-
-					if( null != alive_user){
-						alive_user.setLastHeartBeat(System.currentTimeMillis());
-					}
-
 				}
 				else if(msg.startsWith(ChatSystemConstants.MSG_GET)){
 
@@ -96,22 +89,28 @@ public class MessageHandler implements Runnable{
 					}
 
 					out.print(ChatSystemConstants.MSG_USG);
-					out.print(sb);	
+					out.print(sb);
+					out.flush();
+
+					break;
+
 				}
 				else{
 					log("Received invalid message ("+ msg + ") from " + client);
+
 					break;
 				}
 
 			}// End while
-			
+
 			// Close the connection with client
 			log("Close connection with " + client);
 			client.close();
-			
+
+
 		}catch (IOException e){
 			log(e.getMessage());
 		}
-		
+
 	}
 }

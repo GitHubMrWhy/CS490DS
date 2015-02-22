@@ -5,7 +5,7 @@ package chat.constant;
  */
 public class ChatSystemConstants {
 	
-	
+	public final static String NAME_PATTERN = "([0-9A-Za-z\n])+";
 	/**
 	 * Default port for server 
 	 */
@@ -15,6 +15,11 @@ public class ChatSystemConstants {
 	 * Heart beat rate in millisecond used to maintain user group.
 	 */
 	public final static int HEARTBEAT_RATE = 60*1000;
+	
+	/**
+	 * The maximum length of heart beat message.
+	 */
+	public final static int HEARTBEAT_LEN = 32;
 	
 	/**
 	 * Default size of thread pool.
