@@ -33,7 +33,7 @@ public class MessageReceiver implements Runnable {
 				session.receive(msg);
 			}
 		} catch (IOException e) {	
-			e.printStackTrace();
+			
 		}	
 		
 		synchronized(session){

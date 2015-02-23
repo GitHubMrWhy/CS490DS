@@ -49,6 +49,8 @@ public class SingleThreadedChatServer {
 		listener = new ServerSocket(port);
 		
 		final DatagramSocket udpSocket = new DatagramSocket(port);
+		
+		// Spawn a worker thread to receive heartbeat from users.
 		new Thread(new HeartbeatReceiver(userGroup, udpSocket, isDebug)).start();
 		
 		

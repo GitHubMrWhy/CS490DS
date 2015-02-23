@@ -28,14 +28,19 @@ public class ChatSession {
 	
 	private PrintWriter out;
 	
-	private final ExecutorService service;
+	private final ExecutorService receiver;
+	
+	private final ExecutorService sender;
+	
+	private String otherName;
 	
 	
 	public ChatSession(final ChatClient client){
 		isOccupied = false;
 		out = null;
 		this.client = client;
-		service = Executors.newSingleThreadExecutor();
+		receiver = Executors.newSingleThreadExecutor();
+		sender = Executors.newSingleThreadExecutor();
 	}
 	
 	public boolean isOccupied(){
@@ -49,7 +54,7 @@ public class ChatSession {
 	 */
 	public void receive(final String msg) {
 		if(isOccupied()){
-			client.display(msg);
+			client.display(otherName + ":" + msg);
 		}
 	}
 	
@@ -58,25 +63,42 @@ public class ChatSession {
 	 * @param msg
 	 * 		msg to be sent.
 	 */
-	public void send(final String msg) {
+	public boolean send(final String msg) {
 		if(isOccupied()){
 			out.println(msg);
+			return true;
+		}
+		else {
+			return false;
 		}
 	}
 	
-	public void serve(final Socket theOtherEnd) throws IOException{
-		isOccupied = true;
-		
+	/**
+	 * Start to chat with the client on the other end.
+	 * @param theOtherEnd
+	 * @throws IOException
+	 */
+	public void serve(final Socket theOtherEnd, final String name) throws IOException{
+				
 		out = new PrintWriter(theOtherEnd.getOutputStream(), true);
 		
 		// Spawn a message receiver as worker thread.
-		service.execute(new MessageReceiver(this, theOtherEnd));
+		receiver.execute(new MessageReceiver(this, theOtherEnd));
+		
+		// Spawn a message sender that listens user input and send message
+		sender.execute(new MessageSender(this));
+		
+		otherName = name;
+		
+		isOccupied = true;
+		
 	}
 	
 	public void close(){
+		client.display("Chat session ends.");
 		isOccupied = false;
 		out = null;
-		service.shutdownNow();
+		otherName = null;
 	}
 	
 	

@@ -6,6 +6,7 @@
 package chat.server;
 
 import java.io.IOException;
+import java.net.DatagramSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashSet;
@@ -38,6 +39,11 @@ public class MultithreadedChatServer {
 		pool = Executors.newFixedThreadPool(n_thread);
 		this.isDebug = isDebug;
 
+		final DatagramSocket udpSocket = new DatagramSocket(port);
+
+		// Spawn a worker thread to receive heartbeat from users.
+		new Thread(new HeartbeatReceiver(userGroup, udpSocket, isDebug)).start();
+
 		log("Socket created " + listener.toString());
 	}
 
@@ -61,7 +67,7 @@ public class MultithreadedChatServer {
 			listener.close();
 		}
 	}
-	
+
 	/**
 	 * program runs with optional commands [-port=number] [-debug] [-nthread=number] 
 	 * @param args

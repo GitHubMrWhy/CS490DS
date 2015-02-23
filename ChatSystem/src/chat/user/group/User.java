@@ -39,7 +39,7 @@ public class User {
 	 * "name,ip_addr:port"
 	 */
 	public String toString(){
-		return String.format("%s,%s:%d", name, ipAddress, port); 
+		return String.format("%s, %s:%d", name, ipAddress, port); 
 	}
 
 	/** Getters/Setters */

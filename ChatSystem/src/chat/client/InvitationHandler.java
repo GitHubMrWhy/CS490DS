@@ -31,6 +31,9 @@ public class InvitationHandler implements Runnable {
 	}
 	
 	public void run(){
+		
+		ChatSession session = client.getChatSession();
+		
 		while(true){
 			try {
 				Socket other =  listener.accept();
@@ -42,7 +45,6 @@ public class InvitationHandler implements Runnable {
 				
 				String userName = in.readLine();
 				
-				ChatSession session = client.getChatSession();
 				synchronized(session){
 					
 					if(session.isOccupied()){
@@ -55,9 +57,9 @@ public class InvitationHandler implements Runnable {
 					
 					}else{
 						// Accept the invitation.
-						out.println(ChatSystemConstants.MSG_ACK);
+						out.println(ChatSystemConstants.MSG_ACK + client.getUserName());
 						client.display("Start chat session with "+ userName);			
-						session.serve(other);
+						session.serve(other, userName);
 					}
 				}
 				
