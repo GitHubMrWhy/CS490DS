@@ -1,3 +1,10 @@
+/**
+ * CS490-Chat system
+ * Authors: Online source, Zhiyuan Zheng 
+ *  Large portion of the code is from
+ *  http://www.dreamincode.net/forums/topic/259777-a-simple-chat-program-with-clientserver-gui-optional/
+ * @ Purdue 2015
+ */
 package chat.gui;
 
 import javax.swing.*;
