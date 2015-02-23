@@ -13,6 +13,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import chat.constant.ChatSystemConstants;
+import chat.gui.ChatClientGUI;
 
 /**
  * Receive chat invitation from other clients.
@@ -58,8 +59,14 @@ public class InvitationHandler implements Runnable {
 					}else{
 						// Accept the invitation.
 						out.println(ChatSystemConstants.MSG_ACK + client.getUserName());
-						client.display("Start chat session with "+ userName);			
+						client.display("Start chat session with "+ userName);	
+						
+						ChatClientGUI gui = client.getGUI();
+						if(gui != null){
+							gui.setConnected();
+						}
 						session.serve(other, userName);
+						
 					}
 				}
 				

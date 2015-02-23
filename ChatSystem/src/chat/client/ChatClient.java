@@ -21,7 +21,7 @@ import chat.gui.ChatClientGUI;
 
 public class ChatClient {
 
-	private ChatClientGUI gui;
+	private final ChatClientGUI gui;
 
 	private String userName; 
 
@@ -79,7 +79,7 @@ public class ChatClient {
 		this.isDebug = isDebug;
 		chatSession = new ChatSession(this);
 
-		gui = null;	
+		this.gui = gui;	
 	}
 
 	/**
@@ -250,7 +250,7 @@ public class ChatClient {
 	 */
 	public void display(String msg){
 		if( null != gui){
-			// gui.append(msg);
+			gui.append(msg);
 		}
 		else{
 			System.out.println(msg);
@@ -265,6 +265,13 @@ public class ChatClient {
 		return userName;
 	}
 
+	public ServerSocket getListener(){
+		return listener;
+	}
+
+	public ChatClientGUI getGUI() {
+		return gui;
+	}
 
 	/**
 	 * program runs with commands -ip=(host name|ip address) -port=number [-debug]
@@ -364,10 +371,11 @@ public class ChatClient {
 		 * Waiting for chat invitation.
 		 */
 		// Spin an invitation handler in the main thread.
-		new InvitationHandler(chatClient, chatClient.listener).run();
+		new InvitationHandler(chatClient, chatClient.getListener()).run();
 
 
 
 	}
+
 
 }
