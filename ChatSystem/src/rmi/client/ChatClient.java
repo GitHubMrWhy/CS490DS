@@ -21,7 +21,7 @@ public class ChatClient extends UnicastRemoteObject implements ChatClientIF, Run
 		this.name =name;
 		this.chatServer = chatServer;
 		chatServer.registerChatClient(this);
-		new Thread(new SendHeartBeat(this)).start();
+		//new Thread(new SendHeartBeat(this)).start();
 		
 	}
 
