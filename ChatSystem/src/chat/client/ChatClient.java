@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
 
+import rmi.server.ChatServerIF;
 import chat.constant.ChatSystemConstants;
 import chat.gui.ChatClientGUI;
 
@@ -81,6 +82,7 @@ public class ChatClient {
 
 		this.gui = gui;	
 	}
+
 
 	/**
 	 * Connect to server. 
