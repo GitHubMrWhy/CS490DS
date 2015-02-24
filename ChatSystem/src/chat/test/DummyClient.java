@@ -4,14 +4,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.DatagramSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.Set;
 
-import chat.client.ChatClient;
-import chat.client.HeartbeatSender;
 import chat.constant.ChatSystemConstants;
 
 public class DummyClient {
