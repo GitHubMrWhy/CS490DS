@@ -11,18 +11,17 @@ import rmi.server.*;
 
 
 public class ChatClient extends UnicastRemoteObject implements ChatClientIF, Runnable{
-	private ChatServerIF chatServer;
+	private static ChatServerIF chatServer;
 	private String name = null;
 	private String chattingUserName = null;
-	private long lastHeartBeat=System.currentTimeMillis();
-	private static final int HEARTBEAT_RATE = 10*1000;
+	private static long lastHeartBeat=System.currentTimeMillis();
+	private static final long HEARTBEAT_RATE = 10*1000;
 
-	protected ChatClient(String name,ChatServerIF chatServer) throws RemoteException {
+	public ChatClient(String name,ChatServerIF chatServer) throws RemoteException {
 		this.name =name;
 		this.chatServer = chatServer;
 		chatServer.registerChatClient(this);
-		//new Thread(new SendHeartBeat(this)).start();
-		
+		new SendHeartBeat(this);
 	}
 
 	/**
@@ -39,7 +38,12 @@ public class ChatClient extends UnicastRemoteObject implements ChatClientIF, Run
 
 	public void run() {
 		Scanner s=new Scanner(System.in);
-
+		try {
+			new SendHeartBeat(this);
+		} catch (RemoteException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}	
 		while (true){
 			
 			String input=null;
@@ -139,14 +143,14 @@ public class ChatClient extends UnicastRemoteObject implements ChatClientIF, Run
 
 	public long lastHeartBeat() throws RemoteException {
 		// TODO Auto-generated method stub
-		return lastHeartBeat;
+		return this.lastHeartBeat;
 		
 	}
 
 
 	public void setLastHeartBeat() throws RemoteException {
 		// TODO Auto-generated method stub
-		lastHeartBeat+=HEARTBEAT_RATE;
+		this.lastHeartBeat=this.lastHeartBeat+HEARTBEAT_RATE;
 	}
 
 

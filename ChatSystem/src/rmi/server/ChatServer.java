@@ -8,9 +8,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
 import java.util.Iterator;
+import java.util.concurrent.ConcurrentHashMap;
 
 import chat.user.group.User;
-import rmi.client.ChatClientIF;
+import rmi.client.*;
+
 
 
 public class ChatServer extends UnicastRemoteObject implements ChatServerIF,Runnable{
@@ -24,14 +26,14 @@ public class ChatServer extends UnicastRemoteObject implements ChatServerIF,Runn
 	private static final int HEARTBEAT_RATE = 10*1000;
 
 
-	private HashMap<String,ChatClientIF> ClientList;
+	private static ConcurrentHashMap<String,ChatClientIF> ClientList=new ConcurrentHashMap<String,ChatClientIF>();
 
 	protected ChatServer() throws RemoteException {
 		//chatClients = new ArrayList<ChatClientIF>();
-		this.ClientList = new HashMap<String,ChatClientIF>();
+//		this.ClientList = new ConcurrentHashMap<String,ChatClientIF>();
 	}
 
-	public synchronized void registerChatClient(ChatClientIF chatClient)
+	public  void registerChatClient(ChatClientIF chatClient)
 			throws RemoteException {
 		//System.out.println("registering name: "+chatClient.getUsername());
 		if (this.ClientList.containsKey(chatClient.getUsername())) {
@@ -44,25 +46,21 @@ public class ChatServer extends UnicastRemoteObject implements ChatServerIF,Runn
 			System.out.println("registering "+chatClient.getUsername()+" successful");
 			chatClient.retrieveMessage("registering "+chatClient.getUsername()+" successful");
 		}
-
-
 	}
 
-	public synchronized void boardcastMessage(String message) throws RemoteException {
+	public  void boardcastMessage(String message) throws RemoteException {
 		int i=0;
 		//while (i< chatClients.size()){
 		//chatClients.get(i++).retrieveMessage(message);
 		//}
-
-
 	}
 
-	public synchronized void heartbeat(String chatClientName) throws RemoteException {
+	public  void heartbeat(String chatClientName) throws RemoteException {
 		// TODO Auto-generated method stub
 
 	}
-
-	public synchronized void listAllUser(ChatClientIF chatClient) throws RemoteException {
+	
+	public  void listAllUser(ChatClientIF chatClient) throws RemoteException {
 		System.out.println(chatClient.getUsername()+" send request to list all users");
 		for (String name: this.ClientList.keySet()) {
 			//System.out.println(name);
@@ -74,7 +72,7 @@ public class ChatServer extends UnicastRemoteObject implements ChatServerIF,Runn
 
 	}
 
-	public synchronized boolean containUser(String name) throws RemoteException {
+	public  boolean containUser(String name) throws RemoteException {
 		if(this.ClientList.containsKey(name)){
 			System.out.println("user "+name+ " exist!");
 			return true;
@@ -83,7 +81,7 @@ public class ChatServer extends UnicastRemoteObject implements ChatServerIF,Runn
 		}
 	}
 
-	public synchronized void chatting(ChatClientIF userA, String userNameB, String message)
+	public  void chatting(ChatClientIF userA, String userNameB, String message)
 			throws RemoteException {
 		// TODO Auto-generated method stub
 
@@ -93,7 +91,7 @@ public class ChatServer extends UnicastRemoteObject implements ChatServerIF,Runn
 
 	}
 
-	public synchronized boolean inSession(String name) throws RemoteException {
+	public  boolean inSession(String name) throws RemoteException {
 		// TODO Auto-generated method stub
 		ChatClientIF user = this.ClientList.get(name);
 		if(user.getChattingUserName()==null){
@@ -104,7 +102,7 @@ public class ChatServer extends UnicastRemoteObject implements ChatServerIF,Runn
 		}
 	}
 
-	public synchronized void setSessionWith(ChatClientIF userA, String userNameB)
+	public  void setSessionWith(ChatClientIF userA, String userNameB)
 			throws RemoteException {
 		ChatClientIF userB = this.ClientList.get(userNameB);
 		userB.setChattingUserName(userA.getUsername());
@@ -114,9 +112,11 @@ public class ChatServer extends UnicastRemoteObject implements ChatServerIF,Runn
 
 	}
 
-	public synchronized void run() {
-		// TODO Auto-generated method stub
-		/*
+	public  void run() {
+		
+		
+		
+		
 		while(true){		
 			try {
 				System.out.println("Counting");
@@ -131,20 +131,9 @@ public class ChatServer extends UnicastRemoteObject implements ChatServerIF,Runn
 					System.out.println(cc.lastHeartBeat());
 				}
 
-				// Check if user is alive.
-				for(ChatClientIF cc : this.ClientList.values()){
-					System.out.println(cc.getUsername());
-
-					System.out.println(cc.lastHeartBeat());
-
-				}
 
 				System.out.println(this.ClientList.size());
-				if(this.ClientList.size()>0){
-					ChatClientIF cc=this.ClientList.get("A");
-					System.out.println(cc.getUsername());
-					System.out.println(cc.lastHeartBeat());
-				}
+				
 				Thread.sleep(HEARTBEAT_RATE);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
@@ -154,7 +143,8 @@ public class ChatServer extends UnicastRemoteObject implements ChatServerIF,Runn
 				e.printStackTrace();
 			}
 		}
-		*/
+		
+		
 	}
 
 
