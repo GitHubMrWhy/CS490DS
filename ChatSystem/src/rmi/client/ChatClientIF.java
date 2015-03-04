@@ -4,6 +4,7 @@ import java.rmi.*;
 
 public interface ChatClientIF extends Remote{
 	
+	public void setOther(ChatClientIF other)throws RemoteException;
 	void retrieveMessage(String message) throws RemoteException;
 	void closeChatServer() throws RemoteException;
 	public String getUsername()throws RemoteException;

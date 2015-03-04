@@ -4,15 +4,18 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
+import rmi.server.ChatServerIF;
 import chat.constant.ChatSystemConstants;
 
 public class SendHeartBeat extends UnicastRemoteObject implements  Runnable{
 
-	private static final long HEARTBEAT_RATE = 10*1000;
-	private static ChatClient cc;
-	protected SendHeartBeat(ChatClient cc) throws RemoteException {
-		this.cc=cc;
-		
+	String name;
+	
+	ChatServerIF ss;
+	
+	protected SendHeartBeat(String name, ChatServerIF ss) throws RemoteException {
+		this.ss=ss;
+		this.name = name;
 	}
 
 	/**
@@ -27,15 +30,15 @@ public class SendHeartBeat extends UnicastRemoteObject implements  Runnable{
 			try {
 				
 				// We send a heartbeat quicker in case that the packet gets lost.
-				Thread.sleep(HEARTBEAT_RATE);
-				this.cc.setLastHeartBeat();
+				Thread.sleep(ChatSystemConstants.HEARTBEAT_RATE);
+				this.ss.heartbeat(name);
 				
 				
 			} catch (IOException e) {
-				e.printStackTrace();
+				break;
 				
 			} catch (InterruptedException ie){
-				ie.printStackTrace();
+				break;
 				
 			}
 		}

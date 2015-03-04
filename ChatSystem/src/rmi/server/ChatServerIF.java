@@ -14,7 +14,7 @@ public interface ChatServerIF extends Remote {
 	void chatting(ChatClientIF userA,String userNameB,String message) throws RemoteException;
 	boolean containUser(String name) throws RemoteException;
 	boolean inSession(String name) throws RemoteException;
-	void setSessionWith(ChatClientIF userA,String userNameB) throws RemoteException;
+	ChatClientIF startSessionWith(ChatClientIF userA,String userNameB) throws RemoteException;
 	
 }
  

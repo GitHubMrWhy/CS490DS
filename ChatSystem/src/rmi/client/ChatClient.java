@@ -16,12 +16,13 @@ public class ChatClient extends UnicastRemoteObject implements ChatClientIF, Run
 	private String chattingUserName = null;
 	private static long lastHeartBeat=System.currentTimeMillis();
 	private static final long HEARTBEAT_RATE = 10*1000;
+	private static ChatClientIF other;
 
 	public ChatClient(String name,ChatServerIF chatServer) throws RemoteException {
 		this.name =name;
 		this.chatServer = chatServer;
 		chatServer.registerChatClient(this);
-		new SendHeartBeat(this);
+		new Thread(new SendHeartBeat(name, chatServer)).start();;
 	}
 
 	/**
@@ -29,6 +30,9 @@ public class ChatClient extends UnicastRemoteObject implements ChatClientIF, Run
 	 */
 	private static final long serialVersionUID = 1L;
 
+	public void setOther(ChatClientIF client)throws RemoteException{
+		this.other = client;
+	}
 	public void retrieveMessage(String message) throws RemoteException {
 		// TODO Auto-generated method stub
 		System.out.println(message);
@@ -38,12 +42,7 @@ public class ChatClient extends UnicastRemoteObject implements ChatClientIF, Run
 
 	public void run() {
 		Scanner s=new Scanner(System.in);
-		try {
-			new SendHeartBeat(this);
-		} catch (RemoteException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}	
+
 		while (true){
 			
 			String input=null;
@@ -53,7 +52,10 @@ public class ChatClient extends UnicastRemoteObject implements ChatClientIF, Run
 							
 					System.out.println("Me: "+input);
 					try {
-						chatServer.chatting(this,chattingUserName,input);
+						if(other!=null){
+							//chatServer.chatting(this,chattingUserName,input);
+							other.retrieveMessage(input);
+						}
 					} catch (RemoteException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -76,7 +78,11 @@ public class ChatClient extends UnicastRemoteObject implements ChatClientIF, Run
 							if(chatServer.containUser(userNameB)){
 								if(!chatServer.inSession(userNameB)){
 									System.out.println("Chat session with "+ userNameB +" established");
-									chatServer.setSessionWith(this,userNameB);
+									
+									this.other = chatServer.startSessionWith(this,userNameB);
+									
+									
+									
 									chattingUserName=userNameB;
 									
 								}else{
